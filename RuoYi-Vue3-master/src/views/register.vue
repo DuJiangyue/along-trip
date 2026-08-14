@@ -1,7 +1,10 @@
 <template>
   <div class="register">
     <el-form ref="registerRef" :model="registerForm" :rules="registerRules" class="register-form">
-      <h3 class="title">{{ title }}</h3>
+      <div class="brand">
+        <h2 class="brand-name">一程随行</h2>
+        <p class="brand-slogan">让每一程，都随行</p>
+      </div>
       <el-form-item prop="username">
         <el-input 
           v-model="registerForm.username" 
@@ -160,20 +163,33 @@ getCode()
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
-  background-size: cover;
+  background: linear-gradient(135deg, #409eff 0%, #66b1ff 50%, #a0cfff 100%);
 }
-.title {
-  margin: 0px auto 30px auto;
+.brand {
   text-align: center;
-  color: #707070;
+  margin-bottom: 30px;
+  .brand-name {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #409eff;
+    margin: 0;
+  }
+  .brand-slogan {
+    font-size: 13px;
+    color: #909399;
+    margin: 10px 0 0;
+    letter-spacing: 1px;
+  }
 }
 
 .register-form {
-  border-radius: 6px;
+  border-radius: 16px;
   background: #ffffff;
   width: 400px;
-  padding: 25px 25px 5px 25px;
+  max-width: 90vw;
+  padding: 30px 25px 10px 25px;
+  box-shadow: 0 16px 48px rgba(31, 45, 61, 0.16);
   .el-input {
     height: 40px;
     input {

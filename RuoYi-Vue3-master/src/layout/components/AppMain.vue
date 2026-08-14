@@ -1,5 +1,6 @@
 <template>
   <section class="app-main">
+    <div class="app-main__content">
     <router-view v-slot="{ Component, route }">
       <transition name="fade-transform" mode="out-in">
         <keep-alive :include="tagsViewStore.cachedViews">
@@ -7,6 +8,7 @@
         </keep-alive>
       </transition>
     </router-view>
+    </div>
     <iframe-toggle />
     <copyright />
   </section>
@@ -42,6 +44,16 @@ function addIframe() {
   width: 100%;
   position: relative;
   overflow: hidden;
+  background-color: #eef1f6;
+}
+
+/* 移动端内容区：限宽 480px 居中，白底卡片，深色底衬托 */
+.app-main__content {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: calc(100vh - 50px);
+  background-color: #ffffff;
+  box-shadow: 0 0 20px rgba(31, 45, 61, 0.06);
 }
 
 .fixed-header + .app-main {
