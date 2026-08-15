@@ -1,0 +1,139 @@
+<template>
+  <view class=" pwd-retrieve-container my-page">
+	<form>
+			 <view class="uni-form-item uni-row">
+			   <view class="title">旧密码</view>
+			   <input :class="'uni-input '+oldPassword"
+			   name="oldPassword" 
+			   :password="true"
+			   :value="user.oldPassword" 
+			   placeholder="请输入旧密码" 
+			   @focus="inputFocus('oldPassword')"
+			   @blur="inputBlur('oldPassword')"
+			    @input="inputOld"
+			   />
+			 </view>
+			 <view class="uni-form-item uni-row">
+			   <view class="title">新密码</view>
+			   <input :class="'uni-input '+newPassword"
+				name="newPassword" 
+				:password="true"
+				 :value="user.newPassword"
+				  placeholder="请输入新密码"
+				  @focus="inputFocus('newPassword')"
+				  @blur="inputBlur('newPassword')"
+				  @input="inputNew"
+				 />
+			 </view>
+			 <view class="uni-form-item uni-row">
+			   <view class="title">确认密码</view>
+			   <input :class="'uni-input '+confirmPassword"
+				name="confirmPassword"  
+				:password="true"
+				:value="user.confirmPassword"
+				 placeholder="请确认新密码"
+				 @focus="inputFocus('confirmPassword')"
+				 @blur="inputBlur('confirmPassword')"
+				  @input="inputConfirm"
+				/>
+			 </view>
+			 <button type="primary" @click="submit">提交</button>
+	</form>
+  </view>
+</template>
+
+<script lang="uts">
+  import { updateUserPwd } from "@/api/system/user"
+
+  export default {
+    data() {
+	 type User={
+		 oldPassword: string|null,
+		 newPassword: string|null,
+		 confirmPassword:string|null
+	 }
+      return {
+		  oldPassword:'',
+		  newPassword:'',
+		  confirmPassword:'',
+        user: {
+          oldPassword: null,
+          newPassword: null,
+          confirmPassword: null
+        } as User,
+      }
+    },
+    
+    methods: {
+		inputFocus(tag:string){
+			this.$data[tag]="my-focus"
+		},
+		inputBlur(tag:string){
+			this.$data[tag]="my-blur"
+		},
+		inputOld(event:UniInputEvent){
+			this.user.oldPassword=event.detail.value
+		},
+		inputNew(event:UniInputEvent){
+			this.user.newPassword=event.detail.value
+		},
+		inputConfirm(event:UniInputEvent){
+			this.user.confirmPassword=event.detail.value
+		},
+      submit() {
+		  if(!this.user.oldPassword){
+		  	uni.showToast({
+		  		title:"旧密码不能为空",
+		  		icon:"error"
+		  	})
+		  	return 
+		  }
+		  if(!this.user.newPassword){
+		  	uni.showToast({
+		  		title:"新密码不能为空",
+		  		icon:"error"
+		  	})
+		  	return 
+		  }else if(this.user.newPassword.length<6||this.user.newPassword.length>20){
+		  	uni.showToast({
+		  		title:"长度在6到20个字符",
+		  		icon:"error"
+		  	})
+		  	return
+		  }
+		  if(!this.user.confirmPassword){
+		  	uni.showToast({
+		  		title:"确认密码不能为空",
+		  		icon:"error"
+		  	})
+		  	return 
+		  }else if(this.user.confirmPassword===this.user.newPassword){
+		  	uni.showToast({
+		  		title:"两次输入的密码不一致",
+		  		icon:"error"
+		  	})
+		  	return
+		  }
+          updateUserPwd(this.user.oldPassword, this.user.newPassword).then(response => {
+            uni.showToast({
+                  title: '修改成功',
+                  icon: 'success'
+            });
+          })
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  .my-page {
+    background-color: #ffffff;
+	width: 100%;
+	height: 100%;
+  }
+
+  .pwd-retrieve-container {
+    padding-top: 36rpx;
+    padding: 15px;
+  }
+</style>

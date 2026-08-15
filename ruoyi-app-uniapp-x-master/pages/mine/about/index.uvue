@@ -1,0 +1,134 @@
+<template>
+  <view class=" about-container my-page">
+    <view class=" header-section text-center">
+      <image  style="width: 150rpx;height: auto;" src="/static/logo200.png" mode="widthFix">
+      </image>
+	  <view class="uni-title__box" style="align-items:left">
+	  	<text class="uni-title__base uni-h2"  style="color:#333333 ;">若依移动端</text>
+	  </view>
+    </view>
+
+    <view class=" content-section">
+      <view class=" menu-list">
+        <view class=" list-cell list-cell-arrow">
+          <view class=" menu-item-box uni-row">
+            <view class=" font-14">版本信息</view>
+            <view class=" text-right font-14">v{{version}}</view>
+          </view>
+        </view>
+        <view class=" list-cell list-cell-arrow">
+          <view class=" menu-item-box uni-row">
+            <view class=" font-14">官方邮箱</view>
+            <view class=" text-right font-14">ruoyi@xx.com</view>
+          </view>
+        </view>
+        <view class=" list-cell list-cell-arrow">
+          <view class=" menu-item-box uni-row">
+            <view class=" font-14">服务热线</view>
+            <view class=" text-right font-14">400-999-9999</view>
+          </view>
+        </view>
+        <view class=" list-cell list-cell-arrow">
+          <view class=" menu-item-box uni-row">
+            <view class=" font-14">公司网站</view>
+            <view class=" text-right font-14">
+				<navigator  :url="'/pages/common/webview/index?title=公司网站&url='+url" >{{url}}</navigator>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class=" copyright">
+      <view class="font-14 text-center">Copyright &copy; 2022 ruoyi.vip All Rights Reserved.</view>
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+  export default {
+    data() {
+      return {
+        url: getApp().globalData.config.appInfo.site_url,
+        version: getApp().globalData.config.appInfo.version
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  .my-page {
+    background-color: #f8f8f8;
+	width: 100%;
+	height: 100%;
+  }
+
+  .copyright {
+    margin-top: 50rpx;
+    text-align: center;
+    line-height: 60rpx;
+    color: #999;
+  }
+
+  .header-section {
+    display: flex;
+    padding: 30rpx 0 0;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .uni-title__box {
+  	/* #ifndef APP-NVUE */
+  	display: flex;
+  	/* #endif */
+  	flex-direction: column;
+  	align-items: flex-start;
+  	justify-content: center;
+  	padding: 8px 0;
+  	flex: 1;
+  }
+  
+  .uni-title__base {
+  	font-size: 15px;
+  	color: #333;
+  	/* #ifndef APP-ANDROID */
+  	font-weight: 500;
+  	/* #endif */
+  	/* #ifdef APP-ANDROID */
+  	font-weight: 400;
+  	/* #endif */
+  }
+  
+  .uni-h1 {
+  	font-size: 20px;
+  	color: #333;
+  	font-weight: bold;
+  }
+  
+  .uni-h2 {
+  	font-size: 18px;
+  	color: #333;
+  	font-weight: bold;
+  }
+  
+  .uni-h3 {
+  	font-size: 16px;
+  	color: #333;
+  	font-weight: bold;
+  	/* font-weight: 400; */
+  }
+  
+  .uni-h4 {
+  	font-size: 14px;
+  	color: #333;
+  	font-weight: bold;
+  	/* font-weight: 300; */
+  }
+  
+  .uni-h5 {
+  	font-size: 12px;
+  	color: #333;
+  	font-weight: bold;
+  	/* font-weight: 200; */
+  }
+</style>

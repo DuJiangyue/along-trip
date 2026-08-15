@@ -1,0 +1,130 @@
+import {LogOut} from '@/store'
+import {globalConfig} from '@/config'
+import { getToken } from '@/utils/auth'
+import errorCode from '@/utils/errorCode'
+import { toast, showConfirm, tansParams } from '@/utils/common'
+
+
+
+const upload = (cfg:UTSJSONObject) :Promise<UTSJSONObject>=> {
+	
+  // 是否需要设置 token
+  let isToken:boolean=true
+  let header:UTSJSONObject={}
+  let cfgMap:Map<string,any>=cfg.toMap() as Map<string,any>
+  if(cfg.toMap().has("header")&&cfg.getJSON("header")!=null){
+  	  header=cfg.getJSON("header") as UTSJSONObject
+  	  if(header.toMap().has("isToken")&& header.getBoolean("isToken") == false){
+  	  		isToken=header.getBoolean("isToken") as boolean
+  	  }
+  }
+  const token:string=getToken()
+  if (token!=null&&token!="" && isToken) {
+  	header.set('Authorization','Bearer ' + token)
+  }
+  
+let url:string=""
+  if(cfgMap.has("url")&&cfg.getString("url")!=""&&cfg.getString("url")!=null){
+  	   url=cfg.getString("url") as string
+  }
+  if (cfgMap.has("params")&&cfg.getJSON("params")!=null) {
+  	let paramsJson:UTSJSONObject=cfg.getJSON("params") as UTSJSONObject
+    url+= '?' + tansParams(paramsJson)
+    url = url.slice(0, -1)
+  }
+let baseUrl:string=globalConfig.baseUrl
+  if(cfgMap.has("baseUrl")&&cfg.getString("baseUrl")!=""&&cfg.getString("baseUrl")!=null){
+	  baseUrl=cfg.getString("baseUrl") as string
+  }
+  let timeout:number = 10000
+  if(cfgMap.has("timeout")&&cfg.getString("timeout")!=null){
+  	  timeout=cfg.getNumber("timeout") as number
+  }
+  let filePath:string|null=null;
+  if(cfgMap.has("filePath")&&cfg.getString("filePath")!=null&&cfg.getString("filePath")!=""){
+  	  filePath=cfg.getString("filePath") as string
+  }
+  let name:string="file";
+  if(cfgMap.has("name")&&cfg.getString("name")!=null&&cfg.getString("name")!=""){
+  	  name=cfg.getString("name") as string
+  }
+  let formData:UTSJSONObject|null=null;
+  if(cfgMap.has("formData")&&cfg.getJSON("formData")!=null){
+  	  formData=cfg.getJSON("formData") as UTSJSONObject
+  }
+  return new Promise((resolve, reject) => {
+	  const options={
+        timeout,
+        url: baseUrl + url,
+        filePath,
+        name,
+        header,
+        formData,
+        success: (res:UploadFileSuccess) => {
+		  let data:UTSJSONObject = JSON.parseObject(res.data) as UTSJSONObject
+		  const dataMap:Map<string,any>=data.toMap() as Map<string,any>
+		  let code:number=200
+		  if(dataMap.has("code")&&data.getNumber("code")!=null){
+			code=data.getNumber("code") as number
+		  }
+          let msg:string|null=errorCode[code] as string|null
+			if(msg==""||msg==null){
+				msg=data.getString("msg") as string|null
+			}
+			if(msg==""||msg==null){
+				msg=errorCode['default'] as string
+			}
+          if (code === 200) {
+            resolve(data)
+          } else if (code == 401) {
+            showConfirm("登录状态已过期，您可以继续留在该页面，或者重新登录?").then((res0:ShowModalSuccess) => {
+              if (res0.confirm) {
+                LogOut().then(() => {
+                  uni.reLaunch({ url: '/pages/login/login' })
+                })
+              }
+            })
+            reject('无效的会话，或者会话已过期，请重新登录。')
+          } else if (code === 500) {
+            toast(msg)
+            reject('500')
+          } else if (code !== 200) {
+            toast(msg)
+            reject(code)
+          }
+        },
+        fail: (error:UploadFileFail) => {
+		let { errCode,errMsg } = error
+		switch(errCode){
+			case 5:
+				errMsg='接口超时'
+				break
+			case 1000:
+				errMsg='服务端系统错误'
+				break
+			case 100001:
+				errMsg='json数据解析错误'
+				break
+			case 100002:
+				errMsg="错误信息json解析失败"
+				break
+			case 600003:
+				errMsg="网络中断"
+				break
+			case 600009:
+				errMsg="URL格式不合法"
+				break
+			case 602001:
+				errMsg="request系统错误"
+				break
+		}
+		console.log(errMsg)
+		toast(errMsg)
+		reject(error)
+        }
+      } as UploadFileOptions
+      uni.uploadFile(options)
+  })
+}
+
+export default upload

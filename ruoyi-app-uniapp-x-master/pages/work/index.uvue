@@ -1,0 +1,214 @@
+<template>
+<!-- #ifdef APP -->
+ <scroll-view style="flex:1">
+ <!-- #endif -->
+  <view class="work-container my-page">
+    <!-- 轮播图 -->
+      <swiper class="swiper-box my-swiper" :current="swiperDotIndex" :indicator-dots="true" @change="changeSwiper">
+        <swiper-item v-for="(item, index) in data" :key="index">
+          <view class=" swiper-item " @click="clickBannerItem(item)">
+            <image class="my-image"  :src="item.image" mode="aspectFill" :draggable="false" />
+          </view>
+        </swiper-item>
+      </swiper>
+
+    <!-- 标题栏 -->
+	<view class=" uni-section">
+		<view class=" uni-section-header">
+		<view class=" uni-section-header__decoration line"/>	
+			<view class=" uni-section-header__content">
+			  <text style="font-size:14px;color:#333" class="uni-section__content-title distraction">系统管理</text>
+			</view>
+		</view>
+	</view>
+	<!-- 宫格 -->
+    <view class=" grid-body ">
+	  <view class=" grid uni-row ">
+	        <view class=" grid-item " v-for="(item, index) in items" :key="index" @click="enterItem">
+	          <!-- 您的网格项内容 -->
+	          <uni-icons class="my-icon" :type="item.iconType" :size="30"></uni-icons>
+	          <text class="text">{{ item.text }}</text>
+	        </view>
+	      </view>
+    </view>
+  </view>
+  <!-- #ifdef APP -->
+    </scroll-view>
+  <!-- #endif -->
+</template>
+
+<script lang="uts">
+  export default {
+    data() {
+	  type ImageItem={
+		  image:string
+	  }
+	  type Item={
+	  		  iconType:string,
+			  text:string
+	  }
+      return {
+		items: [
+		      { iconType: "person-filled", text: "用户管理" },
+			  { iconType: "staff-filled", text: "角色管理" },
+			  { iconType: "color", text: "菜单管理" },
+			  { iconType: "settings-filled", text: "部门管理" },
+			  { iconType: "heart-filled", text: "岗位管理" },
+			  { iconType: "bars", text: "字典管理" },
+			  { iconType: "gear-filled", text: "参数设置" },
+			  { iconType: "chat-filled", text: "通知公告" },
+			  { iconType: "wallet-filled", text: "日志管理" }
+		] as Item[],
+        current: 0 as number,
+        swiperDotIndex: 0 as number,
+        data: [{
+            image: '/static/images/banner/banner01.jpg'
+          },
+          {
+            image: '/static/images/banner/banner02.jpg'
+          },
+          {
+            image: '/static/images/banner/banner03.jpg'
+          }
+        ] as ImageItem[]
+      }
+    },
+    methods: {
+      clickBannerItem(item) {
+        console.info(item)
+      },
+      changeSwiper(e) {
+        this.current = e.detail.current
+      },
+      enterItem(e) {
+		  console.log(e)
+		  uni.showToast({
+		        title: '模块建设中~',
+		        icon: 'none'
+		      });
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  /* #ifndef APP-NVUE */
+  .my-page {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: #fff;
+	/* #ifndef APP-ANDROID */
+	min-height: 100%;
+	/* #endif */
+    height: 100%;
+  }
+
+	/* #ifndef APP-ANDROID */
+	  view {
+		font-size: 14px;
+		line-height: inherit;
+	  }
+	/* #endif */
+
+
+  /* #endif */
+
+  .text {
+    text-align: center;
+    font-size: 26rpx;
+    margin-top: 10rpx;
+  }
+
+ 
+  .swiper {
+    height: 300rpx;
+  }
+
+  .swiper-box {
+    height: 150px;
+  }
+
+  .swiper-item {
+    /* #ifndef APP-NVUE */
+    display: flex;
+    /* #endif */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    height: 300rpx;
+    line-height: 300rpx;
+  }
+
+  @media screen and (min-width: 500px) {
+    .my-image {
+      width: 100%;
+    }
+  }
+  
+  .grid-item {
+    width: 25%;
+    padding: 18px 15px;
+	.my-icon{
+		text-align: center;
+	}
+  }
+  
+  $uni-primary: #2979ff !default;
+  
+  .uni-section {
+  	background-color: #fff;
+  .uni-section-header {
+    position: relative;
+    /* #ifndef APP-NVUE */
+    display: flex;
+    /* #endif */
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 10px;
+    font-weight: normal;
+  
+    &__decoration{
+      margin-right: 6px;
+      background-color: $uni-primary;
+      &.line {
+        width: 4px;
+        height: 12px;
+        border-radius: 10px;
+      }
+  
+      &.circle {
+        width: 8px;
+        height: 8px;
+        border-top-right-radius: 50px;
+        border-top-left-radius: 50px;
+        border-bottom-left-radius: 50px;
+        border-bottom-right-radius: 50px;
+      }
+  
+      &.square {
+        width: 8px;
+        height: 8px;
+      }
+    }
+  
+    &__content {
+      /* #ifndef APP-NVUE */
+      display: flex;
+      /* #endif */
+      flex-direction: column;
+      flex: 1;
+      color: #333;
+  
+      .distraction {
+        flex-direction: row;
+        align-items: center;
+      }
+      &-sub {
+        margin-top: 2px;
+      }
+    }
+  }
+  }
+</style>

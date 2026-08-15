@@ -1,0 +1,136 @@
+import {globalConfig} from '@/config';
+import storage from '@/utils/storage';
+import {constant} from '@/utils/constant';
+import { login, logout, getInfo } from '@/api/login';
+import { getToken, setToken, removeToken } from '@/utils/auth';
+import profileImg from '@/static/images/profile.jpg';
+
+
+
+type State = {
+  token: string,
+  name: string,
+  avatar: string,
+  roles: string[],
+  permissions: string[],
+}
+
+const tokenValue = getToken();
+console.log('Token value:', tokenValue);
+
+const nameValue = storage.get(constant.name)??'';
+console.log('Name value:', nameValue);
+
+const avatarValue = storage.get(constant.avatar)??'';
+console.log('Avatar value:', avatarValue);
+
+const rolesValue = storage.get(constant.roles)?? [];
+console.log('Roles value:', rolesValue);
+
+const permissionsValue = storage.get(constant.permissions)?? [];
+console.log('Permissions value:', permissionsValue);
+
+export const state = reactive({
+  token: tokenValue,
+  name: nameValue,
+  avatar: avatarValue,
+  roles: rolesValue,
+  permissions: permissionsValue
+} as State)
+
+export const SetToken=(token: string)=>{
+	state.token = token;
+	setToken(token)
+}
+
+export const SetName=(name: string)=>{
+	state.name = name;
+	storage.set(constant.name, name);
+}
+
+export const SetAvatar=(avatar: string)=> {
+	state.avatar = avatar;
+	storage.set(constant.avatar, avatar);
+}
+
+export const SetRoles=(roles: string[])=>{
+    state.roles = roles;
+    storage.set(constant.roles, roles);
+}
+	
+export const SetPermissions=(permissions: string[]) =>{
+	  state.permissions = permissions;
+	  storage.set(constant.permissions, permissions);
+}
+  // 登录
+export const Login=(userInfo:UTSJSONObject):Promise<void>=> {
+    const username:string = (userInfo.getString("username") as string).trim() as string;
+    const password:string = userInfo.getString("password") as string;
+    const code:string = userInfo.getString("code") as string;
+    const uuid:string = userInfo.getString("uuid") as string;
+	return new Promise((resolve, reject) => {
+	  login(username, password, code, uuid).then((res:UTSJSONObject) => {
+	    SetToken(res.getString("token") as string);
+	    resolve()
+	  }).catch((error:any) => {
+	    reject(error)
+	  })
+	})
+  }
+
+  // 获取用户信息
+export const GetInfo=():Promise<UTSJSONObject>=> {
+  return new Promise((resolve, reject) => {
+	getInfo().then((res:UTSJSONObject) => {
+	  let avatar:string=profileImg as string
+	  let username:string="" as string
+	  const resMap=res.toMap() as Map<string,any>
+	   if(resMap.has("user")){
+		   const user:UTSJSONObject|null = res.getJSON("user");
+		   if(user!=null){
+			const userMap=user.toMap() as Map<string,any>
+			if(userMap.has("avatar")&&user.getString("avatar")!=null&&user.getString("avatar")!=""){
+				avatar=globalConfig.baseUrl + user.getString("avatar") as string
+			}
+			if(userMap.has("userName")&&user.getString("userName")!=null&&user.getString("userName")!=""){
+				username= user.getString("userName") as string
+			}
+		   }
+	   }
+	   let roles=[] as string[]
+	   if(resMap.has("roles")){
+		   roles=res.getArray<string>("roles") as string[]
+		   if(roles.length>0){
+			   let permissions=[] as string[]
+			   if(resMap.has("permissions")){
+				   permissions=res.getArray<string>("permissions") as string[]
+			   }
+			   SetPermissions?.(permissions);
+		   }
+	   }
+	   SetRoles?.(roles)
+	   SetName?.(username);
+	   SetAvatar?.(avatar);
+	   resolve(res)
+	}).catch((error:any) => {
+	  reject(error)
+	})
+  })
+}
+
+  // 退出系统
+  export const LogOut=():Promise<UTSJSONObject>=> {
+	return new Promise<UTSJSONObject>((resolve, reject) => {
+	  logout(state.token).then(() => {
+	    SetToken('');
+		SetRoles([]);
+		SetPermissions([]);   
+		removeToken();
+		storage.clean?.();
+	    resolve({});
+	  }).catch((error:any) => {
+	    reject(error);
+	  })
+	})
+  }
+

@@ -1,0 +1,125 @@
+<template>
+  <view class=" help-container my-page">
+    <view v-for="(item, findex) in list" :key="findex" :title="item.title" class=" list-title">
+      <view class=" text-title uni-row">
+        <view :class="' '+item.icon"></view>{{ item.title }}
+      </view>
+      <view class=" childList">
+        <view v-for="(child, zindex) in item.childList" :key="zindex" class=" question" hover-class="hover"
+          @click="handleText(child)">
+          <view class=" text-item">{{ child.title }}</view>
+          <view class=" line" v-if="zindex !== item.childList.length - 1"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+  export default {
+    data() {
+	  type ChildItem={
+		  title:string,
+		  content:string
+	  }
+	  type Item={
+		  icon:string,
+		  title:string,
+		  childList:ChildItem[]
+	  }
+      return {
+        list: [{
+            icon: 'iconfont icon-github',
+            title: '若依问题',
+            childList: [{
+              title: '若依开源吗？',
+              content: '开源'
+            }, {
+              title: '若依可以商用吗？',
+              content: '可以'
+            }, {
+              title: '若依官网地址多少？',
+              content: 'http://ruoyi.vip'
+            }, {
+              title: '若依文档地址多少？',
+              content: 'http://doc.ruoyi.vip'
+            }]
+          },
+          {
+            icon: 'iconfont icon-help'  as string,
+            title: '其他问题' as string,
+            childList: [{
+              title: '如何退出登录？' as string,
+              content: '请点击[我的] - [应用设置] - [退出登录]即可退出登录' as string,
+            }, {
+              title: '如何修改用户头像？' as string,
+              content: '请点击[我的] - [选择头像] - [点击提交]即可更换用户头像' as string,
+            }, {
+              title: '如何修改登录密码？',
+              content: '请点击[我的] - [应用设置] - [修改密码]即可修改登录密码' as string,
+            }]
+          }
+        ] as Item[]
+      }
+    },
+    methods: {
+     handleText(item) {
+       uni.navigateTo({
+         url: `/pages/common/textview/index?title=${item.title}&content=${item.content}`
+       });
+     }
+    }
+  }
+</script>
+
+<style lang="scss" scoped>
+  .my-page {
+    background-color: #f8f8f8;
+	width: 100%;
+	height: 100%;
+  }
+
+  .help-container {
+    margin-bottom: 100rpx;
+    padding: 30rpx;
+  }
+
+  .list-title {
+    margin-bottom: 30rpx;
+  }
+
+  .childList {
+    background: #ffffff;
+    box-shadow: 0px 0px 10rpx rgba(193, 193, 193, 0.2);
+    border-radius: 16rpx;
+    margin-top: 10rpx;
+  }
+
+  .line {
+    width: 100%;
+    height: 1rpx;
+    background-color: #F5F5F5;
+  }
+
+  .text-title {
+    color: #303133;
+    font-size: 32rpx;
+    font-weight: bold;
+    margin-left: 10rpx;
+
+    .iconfont {
+      font-size: 16px;
+      margin-right: 10rpx;
+    }
+  }
+
+  .text-item {
+    font-size: 28rpx;
+    padding: 24rpx;
+  }
+
+  .question {
+    color: #606266;
+    font-size: 28rpx;
+  }
+</style>

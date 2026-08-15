@@ -1,0 +1,13 @@
+const TokenKey = 'App-Token'
+
+export function getToken():string {
+  return uni.getStorageSync(TokenKey) as string
+}
+
+export function setToken(token:string):void {
+  return uni.setStorageSync(TokenKey, token)
+}
+
+export function removeToken():void {
+  return uni.removeStorageSync(TokenKey)
+}

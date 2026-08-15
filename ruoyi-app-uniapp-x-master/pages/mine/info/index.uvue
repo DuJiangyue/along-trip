@@ -1,0 +1,94 @@
+<template>
+  <view class=" container my-page">
+	<list-view >
+		<list-item class="uni-row item">
+			<uni-icons class="icon" type="person-filled"></uni-icons>
+			<text class="font-14">昵称</text>
+			<text class="font-12 text-right">{{user.nickName}}</text>
+		</list-item>
+		<list-item  class="uni-row item">
+			<uni-icons class="icon" type="phone-filled"></uni-icons>
+			<text  class="font-14">手机号码</text>
+			<text class="font-12 text-right">{{user.phonenumber}}</text>
+		</list-item>
+		<list-item  class="uni-row item">
+			<uni-icons class="icon" type="email-filled"></uni-icons>
+			<text  class="font-14">邮箱</text>
+			<text class="font-12 text-right">{{user.email}}</text>
+		</list-item>
+		<list-item  class="uni-row item">
+			<uni-icons class="icon" type="auth-filled"></uni-icons>
+			<text class="font-14">岗位</text>
+			<text class="font-12 text-right">{{postGroup}}</text>
+		</list-item>
+		<list-item  class="uni-row item">
+			<uni-icons class="icon" type="staff-filled"></uni-icons>
+			<text  class="font-14">角色</text>
+			<text class="font-12 text-right">{{roleGroup}}</text>
+		</list-item>
+		<list-item  class="uni-row item  bottom-solid">
+			<uni-icons class="icon" type="calendar-filled"></uni-icons>
+			<text  class="font-14">创建日期</text>
+			<text class="font-12 text-right">{{user.createTime}}</text>
+		</list-item>
+	</list-view>
+  </view>
+</template>
+
+<script lang="uts">
+  import { getUserProfile } from "@/api/system/user"
+
+  export default {
+    data() {
+      return {
+        user: {} as UTSJSONObject,
+        roleGroup: "" as string,
+        postGroup: "" as string
+      }
+    },
+    onLoad() {
+      this.getUser()
+    },
+    methods: {
+      getUser() {
+        getUserProfile().then((response:any) => {
+          this.user = response.data as UTSJSONObject
+          this.roleGroup = response.roleGroup as string
+          this.postGroup = response.postGroup as string
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  .my-page {
+    background-color: #ffffff;
+	width: 100%;
+	height: 100%;
+  }
+  .item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-top:  1rpx solid rgba(0, 0, 0, 0.1);
+	
+    .icon {
+      color: #007AFF;
+      font-size: 16px;
+      margin-right: 5px;
+    }
+    
+    .text-right {
+      margin-left: auto;
+      color: #999;
+    }
+  }
+
+  
+  .bottom-solid{
+	   border-bottom:  1rpx solid rgba(0, 0, 0, 0.1);
+  }
+  
+</style>

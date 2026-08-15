@@ -1,0 +1,14 @@
+export type Constant= {
+  avatar: string;
+  name: string;
+  roles: string;
+  permissions: string;
+}
+
+export  const constant = {
+  avatar: 'vue_avatar',
+  name: 'vue_name',
+  roles: 'vue_roles',
+  permissions: 'vue_permissions'
+} as Constant;
+ 

@@ -1,0 +1,233 @@
+<template>
+  <view class=" normal-login-container my-page">
+    <view class=" logo-content align-center justify-center flex  uni-row">
+      <image class="my-image" style="width: 100rpx;height: 100rpx;" :src="globalConfig.appInfo.logo" mode="widthFix">
+      </image>
+      <text class="title">若依移动端登录</text>
+    </view>
+    <view class=" login-form-content">
+      <view class=" input-item flex align-center uni-row">
+        <view class=" iconfont icon-user icon"></view>
+        <input v-model="loginForm.username" class="input" type="text" placeholder="请输入账号" maxlength="30" />
+      </view>
+      <view class=" input-item flex align-center uni-row">
+        <view class=" iconfont icon-password icon"></view>
+        <input v-model="loginForm.password" type="password" class="input" placeholder="请输入密码" maxlength="20" />
+      </view>
+      <view class=" input-item flex align-center uni-row" style="width: 60%;margin-top: 10px;" v-if="captchaEnabled">
+        <view class=" iconfont icon-code icon"></view>
+        <input v-model="loginForm.code" type="number" class="input" placeholder="请输入验证码" maxlength="4" />
+        <view class=" login-code"> 
+          <image :src="codeUrl" @click="getCode" class="login-code-img my-image"></image>
+        </view>
+      </view>
+      <view class=" action-btn">
+        <button @click="handleLogin" class="login-btn cu-btn block bg-blue lg round">登录</button>
+      </view>
+      <view class=" reg text-center" v-if="register">
+        <text class="text-grey1">没有账号？</text>
+        <text @click="handleUserRegister" class="text-blue">立即注册</text>
+      </view>
+      <view class=" xieyi justify-center flex  uni-row">
+        <text class="text-grey1 font-14">登录即代表同意</text>
+        <text @click="handleUserAgrement" class="text-blue font-14">《用户协议》</text>
+        <text @click="handlePrivacy" class="text-blue font-14">《隐私协议》</text>
+      </view>
+    </view>
+     
+  </view>
+</template>
+
+<script lang="uts">
+  import { getCodeImg } from '@/api/login'
+  import {Login,GetInfo} from '@/store'
+  export default {
+    data() {
+	  type LoginForm={
+		  username: string,
+		  password: string,
+		  code: string,
+		  uuid: string
+	  }
+      return {
+        codeUrl: "" as string,
+        captchaEnabled: true as boolean,
+        // 用户注册开关
+        register: false as boolean,
+        globalConfig: getApp().globalData.config as UTSJSONObject,
+        loginForm: {
+          username: "admin",
+          password: "admin123",
+          code: "",
+          uuid: ''
+        } as UTSJSONObject
+      }
+    },
+    created() {
+      this.getCode()
+    },
+    methods: {
+      // 用户注册
+      handleUserRegister() {
+        uni.redirectTo({
+          url: '/pages/register'
+        });
+      },
+      // 隐私协议
+      handlePrivacy() {
+        let site = this.globalConfig.appInfo?.agreements[0];
+        uni.navigateTo({
+          url: `/pages/common/webview/index?title=${site.title}&url=${site.url}`
+        });
+      },
+      // 用户协议
+      handleUserAgrement() {
+        let site = this.globalConfig.appInfo?.agreements[1];
+        uni.navigateTo({
+          url: `/pages/common/webview/index?title=${site.title}&url=${site.url}`
+        });
+      },
+      // 获取图形验证码
+      getCode() {
+        getCodeImg().then((res:any) => {
+          this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled as boolean
+          if (this.captchaEnabled) {
+            this.codeUrl = 'data:image/gif;base64,' + res.img as string
+            this.loginForm.uuid = res.uuid as string
+          }
+        })
+      },
+      // 登录方法
+      async handleLogin() {
+        if (this.loginForm.username === "") {
+		  uni.showToast({
+		    title: '请输入您的账号',
+		    icon: 'error', 
+		    duration: 2000 
+		  });
+        } else if (this.loginForm.password === "") {
+		  uni.showToast({
+		    title: '请输入您的密码',
+		    icon: 'error', 
+		    duration: 2000 
+		  });
+        } else if (this.loginForm.code === "" && this.captchaEnabled) {
+		  uni.showToast({
+		    title: '请输入验证码',
+		    icon: 'error', 
+		    duration: 2000 
+		  });
+        } else {
+		  uni.showLoading({
+		    title: '登录中，请耐心等待...'
+		  });
+          this.pwdLogin()
+        }
+      },
+      // 密码登录
+      async pwdLogin() {
+        Login(this.loginForm).then(() => {
+		  uni.hideLoading();
+          this.loginSuccess()
+        }).catch(() => {
+          if (this.captchaEnabled) {
+            this.getCode()
+          }
+        })
+      },
+      // 登录成功后，处理函数
+      loginSuccess() {
+        // 设置用户信息
+        GetInfo().then(() => {
+		  uni.reLaunch({
+		    url: '/pages/index'
+		  });
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  .my-page {
+    background-color: #ffffff;
+	width: 100%;
+	height: 100%;
+  }
+
+  .normal-login-container {
+    width: 100%;
+
+    .logo-content {
+      width: 100%;
+      text-align: center;
+      padding-top: 15%;
+
+      .my-image {
+        border-radius: 4px;
+      }
+
+      .title {
+        margin-left: 10px;
+		font-size: 21px;
+      }
+    }
+
+    .login-form-content {
+      text-align: center;
+      margin: 20px auto;
+      margin-top: 15%;
+      width: 80%;
+
+      .input-item {
+        margin: 10px 0;
+        background-color: #f5f6f7;
+        height: 45px;
+        border-radius: 20px;
+
+        .icon {
+          font-size: 38rpx;
+          margin-left: 10px;
+          color: #999;
+        }
+
+        .input {
+          width: 100%;
+          font-size: 14px;
+          line-height: 20px;
+          text-align: left;
+          padding-left: 15px;
+        }
+
+      }
+
+      .login-btn {
+        margin-top: 30px;
+        height: 45px;
+      }
+      
+      .reg {
+        margin-top: 15px;
+      }
+      
+      .xieyi {
+        color: #333;
+        margin-top: 20px;
+	
+      }
+      
+      .login-code {
+        height: 38px;
+        float: right;
+		width: 200rpx;
+        .login-code-img {
+          height: 38px;
+          position: fixed;
+          margin-left: -20px;
+          width: 200rpx;
+        }
+      }
+    }
+  }
+
+</style>

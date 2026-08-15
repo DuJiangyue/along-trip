@@ -1,0 +1,39 @@
+<script lang="uts">
+import {globalConfig} from './config'
+import { getToken } from '@/utils/auth'
+
+export default {
+  globalData: {
+	  config:{}     
+  },
+  onLaunch() {
+    this.initApp()
+  },
+  methods: {
+    // 初始化应用
+    initApp() {
+      // 初始化应用配置
+      this.initConfig()
+      // 检查用户登录状态
+      //#ifdef H5
+      this.checkLogin()
+      //#endif
+    },
+    initConfig() {
+      this.globalData.config = JSON.parseObject(JSON.stringify(globalConfig)) as UTSJSONObject
+    },
+    checkLogin() {
+		const token=getToken()
+      if (token!=null&&token!="") {
+		uni.reLaunch({
+		  url: '/pages/login'
+		});
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+  @import '@/static/scss/index.scss'
+</style>

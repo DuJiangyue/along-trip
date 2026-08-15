@@ -1,0 +1,209 @@
+<template>
+  <view class=" container my-page">
+    <view class=" example">
+	  <form>
+		 <view class="uni-form-item uni-row">
+		   <view class="title">用户昵称</view>
+		   <input :class="'uni-input '+nickName"
+		   name="nickName" 
+		   :value="user.nickName" 
+		   placeholder="请输入昵称" 
+		   @focus="inputFocus('nickName')"
+		   @blur="inputBlur('nickName')"
+			@input="inputNick"
+		   />		   
+		 </view>
+		 <view class="uni-form-item uni-row">
+		   <view class="title">手机号码</view>
+		   <input :class="'uni-input '+phonenumber"
+			name="phonenumber" 
+			 :value="user.phonenumber"
+			  placeholder="请输入手机号码"
+			  @focus="inputFocus('phonenumber')"
+			  @blur="inputBlur('phonenumber')"
+			  @input="inputPhone"
+			 />
+			 <!-- <uni-icons
+			 	v-if="!user.nickName"
+			 	class="content-clear-icon"
+			 	type="clear"
+			 	:size="24"
+			 	:color="focusShow ? '#2979ff' : '#c0c4cc'"
+			 	@click="onClear('nickName')"
+			 ></uni-icons> -->
+		 </view>
+		 <view class="uni-form-item uni-row">
+		   <view class="title">邮箱</view>
+		   <input :class="'uni-input '+email"
+			name="email"  
+			:value="user.email"
+			 placeholder="请输入姓名"
+			 @focus="inputFocus('email')"
+			 @blur="inputBlur('email')"
+			  @input="inputEmail"
+			/>
+			<!-- <uni-icons
+				v-if="!user.nickName"
+				class="content-clear-icon"
+				type="clear"
+				:size="24"
+				:color="focusShow ? '#2979ff' : '#c0c4cc'"
+				@click="onClear('nickName')"
+			></uni-icons> -->
+		 </view>
+		 <view class="uni-form-item uni-row">
+		   <view class="title">性别</view>
+		   <radio-group name="sex" class="uni-row" @change="changeSex">
+			 <view class="group-item uni-row" v-for="(item,index) in sexs">
+			   <radio class="my-radio" :value="item.value" :checked="item.value==user.sex" />
+			   <text class="my-text">{{item.text}}</text>
+			 </view>
+		   </radio-group>
+		 </view>
+	  </form>
+      <button type="primary" @click="submit">提交</button>
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+  import { getUserProfile } from "@/api/system/user"
+  import { updateUserProfile } from "@/api/system/user"
+  
+  export default {
+    data() {
+	  type Sex={
+		  text:string,
+		  value:string
+	  }
+	  
+      return {
+	    nickName:'',
+	    phonenumber:'',
+	    email:'',
+        user: {
+          nickName: "" as string,
+          phonenumber: "" as string,
+          email: "" as string,
+          sex: "0" as string
+        } as UTSJSONObject,
+        sexs: [{
+          text: '男',
+          value: "0"
+        }, {
+          text: '女',
+          value: "1"
+        }] as Sex[],
+      }
+    },
+    onLoad() {
+      this.getUser()
+    },
+    methods: {
+		changeSex(event: UniRadioGroupChangeEvent){
+			this.user.sex=event.detail.value as string
+		},
+		
+	inputFocus(tag:string){
+		this.$data[tag]="my-focus"
+	},
+	inputBlur(tag:string){
+		this.$data[tag]="my-blur"
+	},
+	inputEmail(event:UniInputEvent){
+		this.user.email=event.detail.value
+	},
+	inputNick(event:UniInputEvent){
+		this.user.nickName=event.detail.value
+	},
+	inputPhone(event:UniInputEvent){
+		this.user.phonenumber=event.detail.value
+	},
+      getUser() {
+        getUserProfile().then((response:any) => {
+          this.user = response.data
+        })
+      },
+      submit(ref) {
+		if(!this.user.nickName){
+			uni.showToast({
+				title:"用户昵称不能为空",
+				icon:"error"
+			})
+			return 
+		}
+		if(!this.user.phonenumber){
+			uni.showToast({
+				title:"手机号码不能为空",
+				icon:"error"
+			})
+			return 
+		}else if(!/^1[3|4|5|6|7|8|9][0-9]\d{8}$/.test(this.user.phonenumber)){
+			uni.showToast({
+				title:"请输入正确的手机号码",
+				icon:"error"
+			})
+			return
+		}
+		if(!this.user.email){
+			uni.showToast({
+				title:"邮箱地址不能为空",
+				icon:"error"
+			})
+			return 
+		}else if(!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(this.user.email)){
+			uni.showToast({
+				title:"请输入正确的邮箱地址",
+				icon:"error"
+			})
+			return
+		}
+        updateUserProfile(this.user).then((response) => {
+          uni.showToast({
+            title: '修改成功',
+            icon: 'success'
+          });
+        });
+	
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  .my-page {
+    background-color: #ffffff;
+	width: 100%;
+	height: 100%;
+  }
+
+  .example {
+    padding: 15px;
+    background-color: #fff;
+  }
+
+
+  .segmented-control {
+    margin-bottom: 15px;
+  }
+
+  .button-group {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .form-item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .button {
+    display: flex;
+    align-items: center;
+    height: 35px;
+    line-height: 35px;
+    margin-left: 10px;
+  }
+</style>

@@ -1,0 +1,97 @@
+<template>
+  <view class=" setting-container my-page">
+    <view class=" menu-list">
+      <view class=" list-cell list-cell-arrow" @click="handleToPwd">
+        <view class=" menu-item-box uni-row">
+          <view class=" iconfont icon-password menu-icon"></view>
+          <view class="font-14">修改密码</view>
+        </view>
+      </view>
+      <view class=" list-cell list-cell-arrow" @click="handleToUpgrade">
+        <view class=" menu-item-box  uni-row">
+          <view class=" iconfont icon-refresh menu-icon"></view>
+          <view class="font-14">检查更新</view>
+        </view>
+      </view>
+      <view class=" list-cell list-cell-arrow" @click="handleCleanTmp">
+        <view class=" menu-item-box  uni-row">
+          <view class=" iconfont icon-clean menu-icon"></view>
+          <view class="font-14">清理缓存</view>
+        </view>
+      </view>
+    </view>
+    <view class=" cu-list menu">
+      <view class=" cu-item item-box">
+        <view class=" content text-center" @click="handleLogout">
+          <text class="text-black">退出登录</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="uts">
+  import {LogOut} from '@/store';
+  export default {
+    data() {
+      return {
+        windowHeight: uni.getSystemInfoSync().windowHeight
+      }
+    },
+    methods: {
+      handleToPwd() {
+        uni.navigateTo({
+          url: '/pages/mine/pwd/index'
+        });
+      },
+      handleToUpgrade() {
+        uni.showToast({
+          title: '模块建设中~',
+          icon: 'none'
+        });
+      },
+      handleCleanTmp() {
+        uni.showToast({
+          title: '模块建设中~',
+          icon: 'none'
+        });
+      },
+      handleLogout() {
+        uni.showModal({
+          title: '提示',
+          content: '确定注销并退出系统吗？',
+          success: (res) => {
+            if (res.confirm) {
+              LogOut().then(() => {
+                uni.reLaunch({
+                  url: '/'
+                });
+              });
+            }
+          }
+        });
+      }
+    }
+  }
+</script>
+
+<style lang="scss" scoped>
+  .my-page {
+    background-color: #f8f8f8;
+	width: 100%;
+	height: 100%;
+  }
+
+  .item-box {
+    background-color: #FFFFFF;
+    margin: 30rpx;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 10rpx;
+    border-radius: 8rpx;
+    color: #303133;
+    font-size: 32rpx;
+  }
+</style>
